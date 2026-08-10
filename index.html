@@ -1,6 +1,7 @@
 <!DOCTYPE html> <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>3D Elfmeter Pro</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -52,7 +53,7 @@ font-size:13px;z-index:22;pointer-events:none;text-align:center;display:none;}
 #keeper-aim-instructions{position:fixed;bottom:55px;left:50%;transform:translateX(-50%);
 background:rgba(0,0,0,.75);color:#0df;padding:6px 18px;border-radius:9px;
 font-size:13px;z-index:22;pointer-events:none;text-align:center;display:none;}
-#spin-ui{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);z-index:15;
+#spin-ui{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);z-index:25;
 display:none;flex-direction:column;align-items:center;gap:6px;}
 #spin-ui h4{font-size:12px;color:#ffe;text-shadow:0 1px 4px #000;}
 #spin-row{display:flex;align-items:center;gap:8px;}
@@ -69,11 +70,11 @@ background:rgba(0,0,0,.6);border:2px solid #0df;border-radius:10px;padding:6px 1
 .sdot.on{background:#0df;}
 #shoot-btn{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
 background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border:none;border-radius:11px;
-padding:11px 32px;font-size:16px;font-weight:bold;cursor:pointer;z-index:15;display:none;
+padding:11px 32px;font-size:16px;font-weight:bold;cursor:pointer;z-index:25;display:none;
 box-shadow:0 4px 14px rgba(231,76,60,.5);}
 #shoot-btn:hover{filter:brightness(1.12);}
 
-#abil-btns{position:fixed;bottom:10px;right:20px;z-index:15;display:none;flex-direction:column;gap:6px;}
+#abil-btns{position:fixed;bottom:10px;right:20px;z-index:25;display:none;flex-direction:column;gap:6px;}
 .abil-btn{padding:8px 14px;border-radius:9px;border:2px solid rgba(255,255,255,.3);
 background:rgba(0,0,0,.7);color:#fff;font-size:12px;font-weight:bold;cursor:pointer;
 transition:all .15s;text-align:left;display:flex;align-items:center;gap:8px;}
@@ -84,7 +85,7 @@ transition:all .15s;text-align:left;display:flex;align-items:center;gap:8px;}
 color:#f1c40f;font-size:11px;font-weight:bold;padding:1px 6px;min-width:20px;text-align:center;}
 .abil-key.used-key{background:rgba(100,100,100,.3);border-color:#555;color:#555;}
 
-#keeper-abil-btns{position:fixed;bottom:10px;right:20px;z-index:15;display:none;flex-direction:column;gap:6px;}
+#keeper-abil-btns{position:fixed;bottom:10px;right:20px;z-index:25;display:none;flex-direction:column;gap:6px;}
 .kabil-btn{padding:8px 14px;border-radius:9px;border:2px solid rgba(0,220,255,.4);
 background:rgba(0,0,0,.7);color:#0df;font-size:12px;font-weight:bold;cursor:pointer;
 transition:all .15s;text-align:left;display:flex;align-items:center;gap:8px;}
@@ -245,6 +246,26 @@ background:rgba(120,0,200,.12) !important;
 }
 #nav-mp-btn{display:none;}
 #nav-mp-leave{display:none;background:rgba(231,76,60,.25);border-color:#e74c3c;color:#ff8a80;}
+.mode-btn{padding:4px 11px;border-radius:7px;border:1.5px solid rgba(255,255,255,.25);
+background:rgba(255,255,255,.06);color:#cde;cursor:pointer;font-weight:bold;font-size:11px;
+transition:all .15s;}
+.mode-btn:hover{border-color:#f1c40f;}
+.mode-btn.active{background:rgba(241,196,15,.25);border-color:#f1c40f;color:#f1c40f;}
+
+/* ── HANDY-MODUS: Schuss-Button rechts, Drall-Pfeile links, größere Touch-Ziele ── */
+body.mode-handy #shoot-btn{
+left:auto; right:14px; bottom:18px; transform:none;
+padding:16px 26px; font-size:17px; border-radius:16px;
+box-shadow:0 4px 18px rgba(231,76,60,.6);
+}
+body.mode-handy #spin-ui{
+left:10px; right:auto; bottom:18px; transform:none;
+}
+body.mode-handy .spin-arrow{width:44px;height:44px;font-size:22px;}
+body.mode-handy #abil-btns{bottom:120px; right:12px;}
+body.mode-handy #keeper-abil-btns{bottom:120px; right:12px;}
+body.mode-handy .abil-btn, body.mode-handy .kabil-btn{padding:11px 16px; font-size:13px;}
+body.mode-handy #instr{bottom:130px;}
 .mp-screen{display:none;flex-direction:column;align-items:center;gap:12px;padding:8px 0;}
 .mp-screen.show{display:flex;}
 .mp-choice-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
@@ -273,6 +294,7 @@ border-radius:10px;padding:12px 18px;text-align:center;font-size:13px;}
 <button class="nav-btn" onclick="openNavModal('stats')">📊 Statistiken</button>
 <button class="nav-btn" id="nav-mp-btn" onclick="openNavModal('mp')">🤝 Mit Freund spielen</button>
 <button class="nav-btn" id="nav-mp-leave" onclick="mpLeaveMatch()">🚪 Verlassen</button>
+<button class="nav-btn" id="nav-devicemode-btn" onclick="cycleDeviceMode()">💻 Computer</button>
 <span id="nav-coins">🪙 <span id="nav-cv">0</span></span>
 </div> <div class="modal-bg" id="modal-level">
 <div class="modal-box" style="max-width:900px;">
@@ -420,6 +442,11 @@ border-radius:10px;padding:12px 18px;text-align:center;font-size:13px;}
 <div id="overlay-inner">
 <h2>⚽ 3D Elfmeter Pro</h2>
 <div id="menu-club-display" style="font-size:13px;color:#f1c40f;text-align:center;"></div>
+<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin:2px 0;">
+<span style="font-size:11px;color:#adf;">🎮 Steuerung:</span>
+<button class="mode-btn" id="mode-btn-computer" onclick="setDeviceMode('computer')">💻 Computer</button>
+<button class="mode-btn" id="mode-btn-handy" onclick="setDeviceMode('handy')">📱 Handy</button>
+</div>
 <p>
 <b>Als Schütze:</b> Klicke ins Tor → Ziel setzen → <kbd>◀</kbd><kbd>▶</kbd> Drall → <kbd>⎵</kbd> Schuss<br>
 <b>Als Torwart:</b> Klicke ins Tor – dein Bauch geht dorthin!<br>
@@ -504,6 +531,41 @@ try {
 const n = localStorage.getItem('ep3_playername');
 if (n) playerName = n;
 } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════
+// GERÄTE-MODUS (Computer / Handy) – steuert Layout der
+// Bedienelemente (Schuss-Button, Drall-Pfeile, Fähigkeiten).
+// Die Spiellogik selbst bleibt in beiden Modi unverändert.
+// ═══════════════════════════════════════════════════════
+let deviceMode = 'computer';
+
+function applyDeviceMode(){
+document.body.classList.toggle('mode-handy', deviceMode==='handy');
+const navBtn=document.getElementById('nav-devicemode-btn');
+if(navBtn) navBtn.textContent = deviceMode==='handy' ? '📱 Handy' : '💻 Computer';
+const mc=document.getElementById('mode-btn-computer');
+const mh=document.getElementById('mode-btn-handy');
+if(mc) mc.classList.toggle('active', deviceMode==='computer');
+if(mh) mh.classList.toggle('active', deviceMode==='handy');
+}
+
+function setDeviceMode(mode){
+deviceMode = (mode==='handy') ? 'handy' : 'computer';
+try{ localStorage.setItem('ep3_devicemode', deviceMode); }catch(e){}
+applyDeviceMode();
+}
+
+function cycleDeviceMode(){
+setDeviceMode(deviceMode==='handy' ? 'computer' : 'handy');
+}
+
+function loadDeviceMode(){
+try{
+const m = localStorage.getItem('ep3_devicemode');
+if(m==='handy'||m==='computer') deviceMode=m;
+}catch(e){}
+applyDeviceMode();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1643,6 +1705,7 @@ CLUBS.forEach(cl=>{if(localStorage.getItem('ep3_'+cl.id)==='1')cl.owned=true;});
 }catch(e){}
 }
 load();
+loadDeviceMode();
 const getS=()=>SHOOTERS[activeSI];
 const getK=()=>KEEPERS[activeKI];
 const getClub=()=>CLUBS.find(c=>c.id===activeClubId)||CLUBS[0];
